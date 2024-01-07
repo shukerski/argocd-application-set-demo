@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: appset
+  namespace: argocd
+spec:
+  generators:
+  - git:
+      repoURL: https://github.com/shukerski/argocd-application-set-demo
+      revision: main
+      files:
+      - path: configs/config-*.yaml
+  template:
+    metadata:
+      name: '{{app.environment}}-{{app.name}}'
+      labels:
+        name: '{{app.environment}}-{{app.name}}'
+        environment: '{{app.environment}}'
+        namespace: '{{app.namespace}}'
+    spec:
+      project: bootstrap
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+        - CreateNamespace=true
+      source:
+        repoURL: '{{chart.repo}}'
+        chart: '{{chart.name}}'
+        targetRevision: '{{chart.version}}'
+        helm:
+          values:
+            '{{chart.values}}'
+      destination:
+        server: '{{app.cluster}}'
+        namespace: '{{app.environment}}-{{app.namespace}}'

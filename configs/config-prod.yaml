@@ -1,0 +1,13 @@
+app:
+  environment: "prod"
+  name: "locust"
+  cluster: "https://kubernetes.default.svc"
+  namespace: "locust"
+
+chart:
+  repo: "https://charts.deliveryhero.io/"
+  name: "locust"
+  version: 0.31.5
+  values: |
+    worker:
+      replicas: 3
